@@ -1,21 +1,13 @@
-require("dotenv").config();
+const express = require("express");
+const app = express();
 
-const mysql = require("mysql");
-const connection = mysql.createConnection({
-   host: process.env.RDS_HOST,
-   user: process.env.RDS_USER,
-   password: process.env.RDS_PASSWORD,
-   database: "white_bear_app",
+app.use("/api/v1/users", require("./api/v1/users"));
+app.get("/", (req, res) => {
+   res.send("Hello World!");
 });
 
-connection.connect();
+const port = process.env.PORT || 3045;
 
-connection.query("SELECT 1 + 1 AS solution", (error, results, fields) => {
-   if (error) {
-      console.log(error);
-   } else {
-      console.log("The solution is: ", results[0].solution);
-   }
+app.listen(port, () => {
+   console.log(`Server running at http://localhost:${port}`);
 });
-
-connection.end();
