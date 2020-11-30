@@ -1,0 +1,96 @@
+/*
+
+I've included a class called .background-image that is how you can perfectly fill a webpage with a background image.
+(It's a pain in the butt to google this. I included the best link I found in the solution.)
+
+Then on your HTML file, create a div that wraps your entire content on the landing page and give it this class.
+
+Example:
+
+<div class="background-image">
+   <div class="container">
+      <!-- More html here -->
+   </div>
+</div>
+
+*/
+
+.background-image {
+   /* https://css-tricks.com/perfect-full-page-background-image/ */
+   background: url("../img/background-landing.jpg") no-repeat center center
+      fixed;
+   // changed URL from "../images/background-landing.jpg"
+   background-size: cover;
+   min-height: 100vh;
+}
+
+.text-brand {
+   font-family: $font-family-brand;
+}
+
+.btn-link {
+   font-weight: $font-weight-bold;
+   padding-left: 0;
+   padding-right: 0;
+}
+
+.btn-group .btn {
+   font-weight: $font-weight-normal;
+}
+
+.card-body {
+   color: $white;
+   font-family: $font-family-serif;
+}
+
+.card-body.bg-primary {
+   border-top-left-radius: $border-radius;
+   border-top-right-radius: $border-radius;
+}
+
+.card-body.bg-secondary {
+   border-bottom-left-radius: $border-radius;
+   border-bottom-right-radius: $border-radius;
+}
+
+.tab-active {
+   background-color: $dark;
+   border: $border-width $dark solid;
+}
+
+.tab-separator {
+   border-left: 1px $dark solid;
+}
+
+textarea {
+   width: 100%;
+   background-color: transparent;
+   color: $white;
+
+   // Remove text-area style: https://stackoverflow.com/a/17110012
+   border: none;
+   overflow: auto;
+   outline: none;
+   -webkit-box-shadow: none;
+   -moz-box-shadow: none;
+   box-shadow: none;
+   resize: none; /*remove the resize handle on the bottom right*/
+}
+
+.bg-success,
+.bg-danger {
+   color: $white;
+}
+
+.font-sans-serif {
+   font-family: $font-family-sans-serif;
+}
+
+.text-blue {
+   color: $blue;
+}
+
+.disabled {
+   pointer-events: fill !important;
+   cursor: not-allowed;
+}
