@@ -24,8 +24,22 @@ router.get("/", (req, res) => {
       constructedSearchTerm,
       order,
    ])
-      .then((dbRes) => {
-         res.json(dbRes);
+      .then((memoryCards) => {
+         const camelCasedMemoryCards = memoryCards.map((memoryCard) => {
+            return {
+               id: memoryCard.id,
+               imagery: memoryCard.imagery,
+               answer: memoryCard.answer,
+               userId: memoryCard.user_id,
+               createdAt: memoryCard.created_at,
+               nextAttemptAt: memoryCard.next_attempt_at,
+               lastAttemptAt: memoryCard.last_attempt_at,
+               totalSuccessfulAttempts: memoryCard.total_successful_attempts,
+               level: memoryCard.level,
+            };
+         });
+         console.log(camelCasedMemoryCards);
+         res.json(camelCasedMemoryCards);
       })
       .catch((err) => {
          console.log(err);

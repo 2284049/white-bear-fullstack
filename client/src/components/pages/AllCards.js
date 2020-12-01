@@ -22,7 +22,9 @@ export default class AllCards extends React.Component {
 
    componentDidMount() {
       axios
-         .get("https://run.mocky.io/v3/cd3b2851-1a2d-46f4-a491-3ce34f57d4f7")
+         .get(
+            "http://localhost:3045/api/v1/memory-cards?userId=97b6d770-b0bf-45f7-8e82-5461eda8df7b&order=%60memory_cards%60.%60created_at%60%20DESC"
+         )
          .then((res) => {
             // handle success
             console.log(res);
