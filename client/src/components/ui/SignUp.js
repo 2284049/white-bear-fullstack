@@ -1,7 +1,6 @@
 import React from "react";
 // import { Link } from "react-router-dom";
 import classnames from "classnames";
-import hash from "object-hash";
 import { v4 as getUuid } from "uuid";
 import { withRouter } from "react-router-dom";
 import { EMAIL_REGEX } from "../../utils/helpers";
@@ -93,32 +92,25 @@ class SignUp extends React.Component {
          this.state.hasEmailError === false &&
          this.state.hasPasswordError === false
       ) {
+         // create user obj
          const user = {
             id: getUuid(),
             email: emailInput,
-            password: hash(passwordInput),
+            password: passwordInput,
             createdAt: Date.now(),
          };
-         console.log(user);
-         console.log("Created user object for POST: ", user); // mimics API response
-         axios // WE WANT THE API CALL TO HAPPEN AFTER THEY'VE BEEN VALIDATED
-            .get(
-               "https://raw.githubusercontent.com/2284049/white-bear-mpa/main/src/mock-data/user.json"
-            )
+         console.log("Created user object for POST: ", user);
+         // post to API
+         axios
+            .post("/api/v1/users", user)
             .then((res) => {
-               // handle success
-               const currentUser = res.data;
-               console.log(currentUser);
-               this.props.dispatch({
-                  // HAD TO HAVE "THIS" FOR PROPS ERROR TO GO AWAY
-                  type: actions.UPDATE_CURRENT_USER,
-                  payload: res.data,
-               });
+               console.log(res);
             })
-            .catch((error) => {
-               // handle error
+            .catch((err) => {
+               console.log(err);
             });
-         this.props.history.push("/create-answer");
+         // update currentUser in global state with API response
+         // go to next page: this.props.history.push("/create-answer");
       }
    }
 
@@ -169,10 +161,11 @@ class SignUp extends React.Component {
                               className="text-muted lead font-sans-serif"
                            >
                               Create a password
+                              <br />
+                              <span className="text-muted">
+                                 Must be at least 9 characters
+                              </span>
                            </label>
-                           <p className="text-muted mt-n2">
-                              Must be at least 9 characters.
-                           </p>
                            <input
                               type="password"
                               className={classnames({
