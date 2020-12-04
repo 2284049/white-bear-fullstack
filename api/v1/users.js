@@ -4,7 +4,8 @@ const express = require("express");
 const router = express.Router();
 const db = require("../../db");
 const selectUser = require("../../queries/selectUser");
-const { toJson, toSafeParse } = require("../../utils/helpers");
+const insertUser = require("../../queries/insertUser");
+const { toJson, toSafeParse, toHash } = require("../../utils/helpers");
 
 // @route       GET api/v1/users
 // @desc        Get a valid user via email & password
@@ -25,8 +26,16 @@ router.get("/", (req, res) => {
 // @route       POST api/v1/users
 // @desc        Create a new user
 // @access      Public
-router.post("/", (req, res) => {
-   console.log(req);
+router.post("/", async (req, res) => {
+   const hashedPassword = await toHash(req.body.password);
+   const user = {
+      id: req.body.id,
+      email: req.body.email,
+      password: hashedPassword,
+      created_at: req.body.createdAt,
+   };
+   console.log(user);
+   db.query(insertUser, user).then().catch();
 });
 
 module.exports = router;
