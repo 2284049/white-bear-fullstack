@@ -1,15 +1,15 @@
-const db = require("../db");
 const { EMAIL_REGEX } = require("../utils/helpers");
+const db = require("../db");
 const selectUserByEmail = require("../queries/selectUserByEmail");
 
-module.exports = function getSignUpEmailError(email) {
+module.exports = async function getSignUpEmailError(email) {
    if (email === "") {
       return "Please enter your email address.";
    }
-   if (EMAIL_REGEX.test(email.toLowerCase()) === false) {
+   if (EMAIL_REGEX.test(email) === false) {
       return "Please enter a valid email address.";
    }
-   if (checkIsInDb(email) === true) {
+   if ((await checkIsInDb(email)) === true) {
       return "This email address already exists in the database.";
    }
    return "";
@@ -23,6 +23,6 @@ function checkIsInDb(email) {
          else return true;
       })
       .catch((err) => {
-         console.log(err.response.data);
+         console.log(err);
       });
 }
