@@ -1,8 +1,6 @@
 import React from "react";
 import classnames from "classnames";
-import { v4 as getUuid } from "uuid";
 import { withRouter } from "react-router-dom";
-import { EMAIL_REGEX } from "../../utils/helpers";
 import axios from "axios";
 import actions from "../../store/actions";
 import { connect } from "react-redux";
@@ -19,77 +17,49 @@ class LogIn extends React.Component {
       };
    }
 
-   async setEmailState(emailInput) {
-      const lowerCasedEmail = emailInput.toLowerCase(); // make their input lowercase
-      if (emailInput === "")
-         // if the email input is blank,
-         this.setState({
-            emailError: "Please enter your email address.", // display this error
-            hasEmailError: true, // make the input box red with is-invalid class
-         });
-      else if (!EMAIL_REGEX.test(lowerCasedEmail)) {
-         // if email does not follow regex format,
-         this.setState({
-            emailError: "Please enter a valid email address.", //display this error
-            hasEmailError: true, // make the input box red with is-invalid class
-         });
-      } else {
-         // otherwise, we don't want an email error (empty string) and we want to set hasEmailError to false to remove is-invalid class
-         this.setState({ emailError: "", hasEmailError: false });
-      }
-   }
-
-   async setPasswordState(passwordInput) {
-      if (passwordInput === "") {
-         this.setState({
-            passwordError: "Please enter your password.", // display this error
-            hasPasswordError: true, // make the input box red with is-invalid class
-         });
-      } else {
-         this.setState({ passwordError: "", hasPasswordError: false });
-      }
-   }
-
    async validateAndLogInUser() {
       const emailInput = document.getElementById("login-email-input").value; // get the user email input
-      await this.setEmailState(emailInput);
       const passwordInput = document.getElementById("login-password-input")
          .value;
-      await this.setPasswordState(passwordInput, emailInput);
-      if (
-         this.state.hasEmailError === false &&
-         this.state.hasPasswordError === false
-      ) {
-         const user = {
-            id: getUuid(),
-            email: emailInput,
-            password: passwordInput,
-            loggedInAt: Date.now(),
-         };
-         console.log("Created user object for POST: ", user); // mimics API response
-         axios // WE WANT THE API CALL TO HAPPEN AFTER THEY'VE BEEN VALIDATED
-            .get(
-               "https://raw.githubusercontent.com/2284049/white-bear-mpa/main/src/mock-data/user.json"
-            )
-            .then((res) => {
-               // handle success
-               const currentUser = res.data;
-               console.log(currentUser);
-               this.props.dispatch({
-                  // HAD TO HAVE "THIS" FOR PROPS ERROR TO GO AWAY
-                  type: actions.UPDATE_CURRENT_USER,
-                  payload: res.data,
-               });
-            })
-            .catch((error) => {
-               // handle error
+      const user = {
+         email: emailInput,
+         password: passwordInput,
+      };
+      axios // WE WANT THE API CALL TO HAPPEN AFTER THEY'VE BEEN VALIDATED
+         .post("/api/v1/users/auth", user)
+         .then((res) => {
+            // Update currentUser in global state with API response
+            this.props.dispatch({
+               type: actions.UPDATE_CURRENT_USER,
+               payload: res.data,
             });
-         // TO TAKE THE VALIDATED USER TO NEXT PAGE
-         // First, put up top: import { withRouter } from "react-router-dom";
-         // take out the export defult at top and put on bottom of page like this: export default withRouter(LogIn);
-         // use this code to tell it which page to go to:
-         this.props.history.push("/create-answer");
-      }
+            this.props.history.push("/create-answer");
+         })
+         .catch((err) => {
+            const data = err.response.data;
+            console.log(data);
+            const { emailError, passwordError } = data;
+            if (emailError !== "") {
+               this.setState({ hasEmailError: true, emailError: emailError });
+            } else {
+               this.setState({ hasEmailError: false, emailError: emailError });
+            }
+            if (passwordError !== "") {
+               this.setState({
+                  hasPasswordError: true,
+                  passwordError: passwordError,
+               });
+            } else {
+               this.setState({
+                  hasPasswordError: false,
+                  passwordError: passwordError,
+               });
+            }
+         });
+      // TO TAKE THE VALIDATED USER TO NEXT PAGE
+      // First, put up top: import { withRouter } from "react-router-dom";
+      // take out the export defult at top and put on bottom of page like this: export default withRouter(LogIn);
+      // use this code to tell it which page to go to:
    }
 
    render() {
