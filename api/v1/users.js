@@ -81,7 +81,7 @@ router.post("/auth", async (req, res) => {
                createdAt: users[0].created_at,
             };
             const accessToken = jwt.sign(user, process.env.JWT_ACCESS_SECRET, {
-               expiresIn: "1m",
+               expiresIn: "100m",
             });
             // jwt.sign(payload, secretOrPrivateKey, [options, callback])
             // options: expiresIn: Eg: 60, "2 days", "10h", "7d". A numeric value is interpreted as a seconds count.
