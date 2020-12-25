@@ -1,5 +1,6 @@
 import actions from "../actions";
 import isEmpty from "lodash/isEmpty";
+import axios from "axios";
 
 export default function currentUser(currentUser = {}, action) {
    // let newCurrentUser = { ...currentUser };
@@ -12,6 +13,7 @@ export default function currentUser(currentUser = {}, action) {
             // https://youtu.be/5d3bT0Dk8Pw?t=3391
             // make sure you import lodash up top: import isEmpty from "lodash/isEmpty"
             localStorage.removeItem("authToken");
+            delete axios.defaults.headers.common["x-auth-token"];
          }
          return action.payload;
       default:

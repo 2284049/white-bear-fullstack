@@ -2,7 +2,7 @@ import React from "react";
 import AppTemplate from "../ui/AppTemplate";
 import MemoryCard from "../ui/MemoryCard";
 import axios from "axios";
-const userId = "97b6d770-b0bf-45f7-8e82-5461eda8df7b";
+// const userId = "97b6d770-b0bf-45f7-8e82-5461eda8df7b";
 
 // THIS PAGE IS A GOOD EXAMPLE OF
 // ***** LOCAL STATE *****
@@ -46,7 +46,7 @@ export default class AllCards extends React.Component {
    setMemoryCards() {
       axios
          .get(
-            `http://localhost:3045/api/v1/memory-cards?userId=${userId}&searchTerm=${this.state.searchTerm}&order=${this.state.order}`
+            `http://localhost:3045/api/v1/memory-cards?searchTerm=${this.state.searchTerm}&order=${this.state.order}`
          )
          .then((res) => {
             // handle success

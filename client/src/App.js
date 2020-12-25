@@ -13,6 +13,7 @@ import NotFound from "./components/pages/NotFound";
 import jwtDecode from "jwt-decode";
 import store from "./store/store";
 import actions from "./store/actions";
+import axios from "axios";
 
 const authToken = localStorage.authToken;
 if (authToken) {
@@ -25,6 +26,7 @@ if (authToken) {
          type: actions.UPDATE_CURRENT_USER,
          payload: {},
       });
+      delete axios.defaults.headers.common["x-auth-token"];
       // remove the currentUser from the global store
    } else {
       console.log("valid token");
@@ -33,15 +35,18 @@ if (authToken) {
          type: actions.UPDATE_CURRENT_USER,
          payload: user,
       });
+      // set authorization headers for every request:
+      axios.defaults.headers.common["x-auth-token"] = authToken;
+
       const currentURL = window.location.pathname;
       if (currentURL === "/") {
          window.location.href = "/create-answer";
          // redirect to create-answer
       }
    }
-   // set authorization headers
 } else {
    console.log("no token");
+   delete axios.defaults.headers.common["x-auth-token"];
 }
 
 function App() {

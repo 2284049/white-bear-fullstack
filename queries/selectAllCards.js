@@ -10,4 +10,6 @@ const selectAllCards = `
     ORDER BY 
         ?;
     `;
+// the question marks are defined in memory-cards.js
+// at this point: db.query(selectAllCards, [INSIDE THIS ARRAY])
 module.exports = selectAllCards;
