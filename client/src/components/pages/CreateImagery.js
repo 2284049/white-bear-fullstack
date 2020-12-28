@@ -4,8 +4,11 @@ import { Link } from "react-router-dom";
 import saveIcon from "../../icons/save.svg";
 import classnames from "classnames";
 import { checkIsOver, MAX_CARD_CHARS } from "../../utils/helpers";
+import { connect } from "react-redux";
+import actions from "../../store/actions";
+import axios from "axios";
 
-export default class CreateImagery extends React.Component {
+class CreateImagery extends React.Component {
    constructor(props) {
       super(props);
       this.state = {
@@ -15,7 +18,6 @@ export default class CreateImagery extends React.Component {
 
    setImageryText(e) {
       this.setState({ imageryText: e.target.value }); // set the state of imageryText to be whatever the user inputs in that field (e.target.value)
-      console.log(e.target.value);
    }
 
    checkHasInvalidCharCount() {
@@ -25,6 +27,52 @@ export default class CreateImagery extends React.Component {
       ) {
          return true;
       } else return false;
+   }
+
+   async updateCreatableCard() {
+      console.log("UPDATING CREATABLE CARD");
+      const {
+         id,
+         answer,
+         userId,
+         createdAt,
+         nextAttemptAt,
+         lastAttemptAt,
+         totalSuccessfulAttempts,
+         level,
+      } = this.props.creatableCard;
+      // we are getting all these properties from creatableCard in the Redux Global State Store
+      // and giving them all the suffix of this.props.creatableCard
+      // so now we have "answer" as a const we can use below which = this.props.creatableCard.answer
+      await this.props.dispatch({
+         type: actions.UPDATE_CREATABLE_CARD,
+         payload: {
+            id: id, // or just id,
+            answer: answer, // or just answer,
+            imagery: this.state.imageryText, // if the key and the value are the same, you can type it once
+            userId,
+            createdAt,
+            nextAttemptAt,
+            lastAttemptAt,
+            totalSuccessfulAttempts,
+            level,
+         },
+      });
+      // save to database (make an api call),
+      axios // WE WANT THE API CALL TO HAPPEN AFTER THEY'VE BEEN VALIDATED
+         .post("/api/v1/memory-cards", this.props.creatableCard)
+         .then((res) => {
+            console.log("Memory Card created");
+            // display success overaly
+            // route to create-answer
+         })
+         .catch((err) => {
+            const data = err.response.data;
+            console.log(data);
+            // display error overlay
+            // hide error overlay after 5 sec
+            // stay on this page
+         });
    }
 
    render() {
@@ -55,10 +103,7 @@ export default class CreateImagery extends React.Component {
             </div>
             <div className="card">
                <div className="card-body bg-secondary lead">
-                  One morning, when Gregor Samsa woke from troubled dreams, he
-                  found himself transformed in his bed into a horrible vermin.
-                  He lay on his armour-like back, and if he lifted his head a
-                  little he could se
+                  {this.props.creatableCard.answer}
                </div>
             </div>
 
@@ -88,15 +133,16 @@ export default class CreateImagery extends React.Component {
             >
                Back to answer
             </Link>
-            <Link
-               to="/create-answer"
+            <button
                className={classnames(
                   "btn btn-primary btn-lg ml-4 float-right",
                   {
                      disabled: this.checkHasInvalidCharCount(),
                   }
                )}
-               id="save-card"
+               onClick={() => {
+                  this.updateCreatableCard();
+               }}
             >
                <img
                   src={saveIcon}
@@ -109,8 +155,19 @@ export default class CreateImagery extends React.Component {
                   }}
                />
                Save
-            </Link>
+            </button>
          </AppTemplate>
       );
    }
 }
+
+// THIS IS WHAT WE NEED TO MAKE REDUX WORK ON THIS PAGE
+function mapStateToProps(state) {
+   //global state
+   return { creatableCard: state.creatableCard };
+   // we are creating a property called creatableCard and getting it from the Redux Store global state
+   // we are mapping what we just grabbed from the Redux Global State Store and giving it to this local component
+   // up in updateCreatableCard(), we will pass it in:
+   //
+}
+export default connect(mapStateToProps)(CreateImagery);

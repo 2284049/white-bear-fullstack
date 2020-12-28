@@ -18,7 +18,7 @@ module.exports = function validateJwt(req, res, next) {
          accessToken,
          process.env.JWT_ACCESS_SECRET
       );
-      console.log("Here's the decoded payload: ", decodedPayload);
+      // console.log("Here's the decoded payload: ", decodedPayload);
       // assigning the payload to the request
       req.user = decodedPayload;
       // continue on in the API
