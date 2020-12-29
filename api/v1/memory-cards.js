@@ -94,17 +94,16 @@ router.post("/", validateJwt, (req, res) => {
       level,
    };
    console.log("Here's the memory card: ", memoryCard);
-   db.query(insertMemoryCard, memoryCard)
+   db.query(insertMemoryCard, memoryCard) // in the insertMemoryCard function, the ? = memoryCard
       .then((dbRes) => {
-         // in the insertMemoryCard function, the ? = memoryCard
          // success
-         // return with a status response
          console.log("Created memory card in the db: ", dbRes);
+         return res.status(200).json({ success: "Card created" }); // return with a status
       })
       .catch((err) => {
-         // error
-         // return with an error status response
          console.log(err);
+         dbError = `${err.code} ${err.sqlMessage}`;
+         res.status(400).json({ dbError });
       });
 });
 

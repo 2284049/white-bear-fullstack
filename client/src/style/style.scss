@@ -15,6 +15,10 @@ Example:
 
 */
 
+html {
+   overflow-y: scroll;
+}
+
 .background-image {
    /* https://css-tricks.com/perfect-full-page-background-image/ */
    background: url("../img/background-landing.jpg") no-repeat center center
