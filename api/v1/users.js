@@ -35,12 +35,23 @@ router.post("/", async (req, res) => {
          .then(() => {
             db.query(selectUserById, id)
                .then((users) => {
-                  const user = users[0];
-                  res.status(200).json({
-                     id: user.id,
-                     email: user.email,
-                     createdAt: user.created_at,
-                  });
+                  const user = {
+                     id: users[0].id,
+                     email: users[0].email,
+                     createdAt: users[0].created_at,
+                  };
+                  const accessToken = jwt.sign(
+                     // create an access token
+                     user,
+                     process.env.JWT_ACCESS_SECRET,
+                     {
+                        expiresIn: "100m",
+                     }
+                  );
+                  // jwt.sign(payload, secretOrPrivateKey, [options, callback])
+                  // options: expiresIn: Eg: 60, "2 days", "10h", "7d". A numeric value is interpreted as a seconds count.
+                  // 60 = 60 seconds but "60" = 60 milliseconds
+                  res.status(200).json(accessToken); // display that access token
                })
                .catch((err) => {
                   console.log(err);
@@ -74,7 +85,6 @@ router.post("/auth", async (req, res) => {
       // return the user to the client
       db.query(selectUserByEmail, email)
          .then((users) => {
-            // TODO: repeat when creating a user
             const user = {
                id: users[0].id,
                email: users[0].email,

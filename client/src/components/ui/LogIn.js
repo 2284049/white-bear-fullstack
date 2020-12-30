@@ -29,7 +29,7 @@ class LogIn extends React.Component {
       axios // WE WANT THE API CALL TO HAPPEN AFTER THEY'VE BEEN VALIDATED
          .post("/api/v1/users/auth", user)
          .then((res) => {
-            // Set token in localstorage
+            // Set token in local storage on client side
             const authToken = res.data;
             localStorage.setItem("authToken", authToken);
             const user = jwtDecode(authToken);
