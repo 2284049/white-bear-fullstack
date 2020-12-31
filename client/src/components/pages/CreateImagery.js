@@ -30,51 +30,53 @@ class CreateImagery extends React.Component {
    }
 
    async updateCreatableCard() {
-      console.log("UPDATING CREATABLE CARD");
-      const {
-         id,
-         answer,
-         userId,
-         createdAt,
-         nextAttemptAt,
-         lastAttemptAt,
-         totalSuccessfulAttempts,
-         level,
-      } = this.props.creatableCard;
-      // we are getting all these properties from creatableCard in the Redux Global State Store
-      // and giving them all the suffix of this.props.creatableCard
-      // so now we have "answer" as a const we can use below which = this.props.creatableCard.answer
-      await this.props.dispatch({
-         type: actions.UPDATE_CREATABLE_CARD,
-         payload: {
-            id: id, // or just id,
-            answer: answer, // or just answer,
-            imagery: this.state.imageryText, // if the key and the value are the same, you can type it once
+      if (!this.checkHasInvalidCharCount()) {
+         console.log("UPDATING CREATABLE CARD");
+         const {
+            id,
+            answer,
             userId,
             createdAt,
             nextAttemptAt,
             lastAttemptAt,
             totalSuccessfulAttempts,
             level,
-         },
-      });
-
-      axios // save to database (make an api call)
-         .post("/api/v1/memory-cards", this.props.creatableCard)
-         .then((res) => {
-            console.log("Memory Card created");
-            // display success overlay
-            this.props.dispatch({
-               type: actions.UPDATE_CREATABLE_CARD,
-               payload: {}, // this empty object clears creatableCard from Redux Store
-            });
-            this.props.history.push("/create-answer"); // route to create-answer
-         })
-         .catch((err) => {
-            const data = err.response.data;
-            console.log(data);
-            // display error overlay & hide error overlay after 5 sec
+         } = this.props.creatableCard;
+         // we are getting all these properties from creatableCard in the Redux Global State Store
+         // and giving them all the suffix of this.props.creatableCard
+         // so now we have "answer" as a const we can use below which = this.props.creatableCard.answer
+         await this.props.dispatch({
+            type: actions.UPDATE_CREATABLE_CARD,
+            payload: {
+               id: id, // or just id,
+               answer: answer, // or just answer,
+               imagery: this.state.imageryText, // if the key and the value are the same, you can type it once
+               userId,
+               createdAt,
+               nextAttemptAt,
+               lastAttemptAt,
+               totalSuccessfulAttempts,
+               level,
+            },
          });
+
+         axios // save to database (make an api call)
+            .post("/api/v1/memory-cards", this.props.creatableCard)
+            .then((res) => {
+               console.log("Memory Card created");
+               // display success overlay
+               this.props.dispatch({
+                  type: actions.UPDATE_CREATABLE_CARD,
+                  payload: {}, // this empty object clears creatableCard from Redux Store
+               });
+               this.props.history.push("/create-answer"); // route to create-answer
+            })
+            .catch((err) => {
+               const data = err.response.data;
+               console.log(data);
+               // display error overlay & hide error overlay after 5 sec
+            });
+      }
    }
 
    render() {

@@ -59,7 +59,7 @@ router.get("/", validateJwt, (req, res) => {
             };
          });
          console.log(camelCasedMemoryCards);
-         res.json(camelCasedMemoryCards);
+         return res.status(200).json(camelCasedMemoryCards);
       })
       .catch((err) => {
          console.log(err);

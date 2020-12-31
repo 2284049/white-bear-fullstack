@@ -11,7 +11,9 @@ class ReviewImagery extends React.Component {
       if (props.queue.cards.length === 0) {
          // if this is an empty array, then:
          axios
-            .get("https://run.mocky.io/v3/cd3b2851-1a2d-46f4-a491-3ce34f57d4f7")
+            .get(
+               `http://localhost:3045/api/v1/memory-cards?&order=memory_cards.created_at%20DESC`
+            )
             .then((res) => {
                // handle success
                console.log(res);
