@@ -60,6 +60,11 @@ export default class AllCards extends React.Component {
          });
    }
 
+   hasNoCards() {
+      if (this.state.memoryCards.length === 0) return true;
+      else return false;
+   }
+
    render() {
       return (
          <AppTemplate>
@@ -110,6 +115,11 @@ export default class AllCards extends React.Component {
             {this.state.memoryCards.map((memoryCard) => {
                return <MemoryCard card={memoryCard} key={memoryCard.id} />;
             })}
+            {this.hasNoCards() && (
+               <p className="lead text-muted text-center">
+                  You have 0 cards. Please create a card.
+               </p>
+            )}
          </AppTemplate>
       );
    }

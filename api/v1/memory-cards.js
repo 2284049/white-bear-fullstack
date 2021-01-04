@@ -6,6 +6,7 @@ const db = require("../../db");
 const selectAllCards = require("../../queries/selectAllCards");
 const insertMemoryCard = require("../../queries/insertMemoryCard");
 const updateMemoryCard = require("../../queries/updateMemoryCard");
+const deleteMemoryCardById = require("../../queries/deleteMemoryCardById");
 
 const validateJwt = require("../../utils/validateJwt");
 
@@ -112,7 +113,6 @@ router.post("/", validateJwt, (req, res) => {
 // @desc        Update a memory card in the memory cards resource
 // @access      Private
 router.put("/:id", validateJwt, (req, res) => {
-   // create a const that has the same properties as the table in your database
    const id = req.params.id; // memory card id from URL
    // params is part of EXPRESS, it gives you anything after the slash in URL
    // console.log("memory card id: ", id);
@@ -148,6 +148,22 @@ router.put("/:id", validateJwt, (req, res) => {
          console.log(err);
          const dbError = `${err.code} ${err.sqlMessage}`;
          res.status(400).json({ dbError });
+      });
+});
+
+// @route       DELETE api/v1/memory-cards/:id
+// @desc        Delete a memory card in the memory cards resource
+// @access      Private
+router.delete("/:id", validateJwt, (req, res) => {
+   const id = req.params.id; // memory card id from URL
+   db.query(deleteMemoryCardById, id)
+      .then(() => {
+         return res.status(200).json({ success: "Card deleted" }); // return with a status
+      })
+      .catch((err) => {
+         console.log(err);
+         const dbError = `${err.code} ${err.sqlMessage}`;
+         res.status(500).json({ dbError });
       });
 });
 

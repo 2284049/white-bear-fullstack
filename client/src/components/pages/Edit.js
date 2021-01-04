@@ -59,16 +59,6 @@ class Edit extends React.Component {
       } else return false;
    }
 
-   deleteCard() {
-      // TODO: delete from database
-      if (this.props.editableCard.prevRoute === "/review-answer") {
-         this.deleteCardFromStore();
-      }
-      if (this.props.editableCard.prevRoute === "/all-cards") {
-         this.props.history.push("/all-cards");
-      }
-   }
-
    saveCardEdit() {
       if (!this.checkHasInvalidCharCount()) {
          const memoryCard = { ...this.props.editableCard.card }; // make a shallow copy first
@@ -96,20 +86,36 @@ class Edit extends React.Component {
       }
    }
 
-   deleteCardFromStore() {
-      const deletedCard = this.props.editableCard.card;
-      const cards = this.props.queue.cards;
-      const filteredCards = without(cards, deletedCard);
-      console.log(filteredCards);
-      this.props.dispatch({
-         type: actions.UPDATE_QUEUED_CARDS,
-         payload: filteredCards,
-      });
-      if (filteredCards[this.props.queue.index] === undefined) {
-         this.props.history.push("/review-empty");
-      } else {
-         this.props.history.push("/review-imagery");
-      }
+   deleteCard() {
+      // query db to delete card
+      const memoryCard = { ...this.props.editableCard.card }; // make a shallow copy first
+      axios
+         .delete(`/api/v1/memory-cards/${memoryCard.id}`) // delete card from db
+         .then((res) => {
+            console.log(res.data);
+            // now update the redux store:
+            const cards = [...this.props.queue.cards];
+            const filteredCards = without(cards, memoryCard);
+            this.props.dispatch({
+               type: actions.UPDATE_QUEUED_CARDS,
+               payload: filteredCards,
+            });
+            // display success overlay
+            if (this.props.editableCard.prevRoute === "/review-answer") {
+               if (filteredCards[this.props.queue.index] === undefined) {
+                  this.props.history.push("/review-empty");
+               } else {
+                  this.props.history.push("/review-imagery");
+               }
+            }
+            if (this.props.editableCard.prevRoute === "/all-cards") {
+               this.props.history.push("/all-cards");
+            }
+         })
+         .catch((err) => {
+            console.log(err.response.data);
+            // display error overlay
+         });
    }
 
    render() {
