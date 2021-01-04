@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 module.exports = function validateJwt(req, res, next) {
    // middle ware functions must have these 3 parameters (req, res, next)
-   console.log("I'm validating JWT");
+   // console.log("I'm validating JWT");
    const accessToken = req.header("x-auth-token");
    if (!accessToken) {
       // if not access token
@@ -12,7 +12,7 @@ module.exports = function validateJwt(req, res, next) {
    try {
       // verify the token
       // if valid, extract the user payload
-      console.log(accessToken);
+      // console.log(accessToken);
 
       const decodedPayload = jwt.verify(
          accessToken,

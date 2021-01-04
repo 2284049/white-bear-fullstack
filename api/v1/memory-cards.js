@@ -5,6 +5,7 @@ const router = express.Router();
 const db = require("../../db");
 const selectAllCards = require("../../queries/selectAllCards");
 const insertMemoryCard = require("../../queries/insertMemoryCard");
+const updateMemoryCard = require("../../queries/updateMemoryCard");
 
 const validateJwt = require("../../utils/validateJwt");
 
@@ -86,7 +87,7 @@ router.post("/", validateJwt, (req, res) => {
       id,
       imagery,
       answer,
-      user_id: req.user.id,
+      user_id: req.user.id, // req.user is part of validateJwt; that is where we defined req.user
       created_at: createdAt,
       next_attempt_at: nextAttemptAt,
       last_attempt_at: lastAttemptAt,
@@ -102,7 +103,50 @@ router.post("/", validateJwt, (req, res) => {
       })
       .catch((err) => {
          console.log(err);
-         dbError = `${err.code} ${err.sqlMessage}`;
+         const dbError = `${err.code} ${err.sqlMessage}`;
+         res.status(400).json({ dbError });
+      });
+});
+
+// @route       PUT api/v1/memory-cards/:id
+// @desc        Update a memory card in the memory cards resource
+// @access      Private
+router.put("/:id", validateJwt, (req, res) => {
+   // create a const that has the same properties as the table in your database
+   const id = req.params.id; // memory card id from URL
+   // params is part of EXPRESS, it gives you anything after the slash in URL
+   // console.log("memory card id: ", id);
+   // We need to build the memory card object to put it into the db:
+   const {
+      imagery,
+      answer,
+      createdAt,
+      nextAttemptAt,
+      lastAttemptAt,
+      totalSuccessfulAttempts,
+      level,
+   } = req.body;
+   const memoryCard = {
+      id,
+      imagery,
+      answer,
+      user_id: req.user.id, // req.user is part of validateJwt; that is where we defined req.user
+      created_at: createdAt,
+      next_attempt_at: nextAttemptAt,
+      last_attempt_at: lastAttemptAt,
+      total_successful_attempts: totalSuccessfulAttempts,
+      level,
+   };
+   console.log("Here's the updated memory card: ", memoryCard);
+   db.query(updateMemoryCard, [memoryCard, memoryCard.id]) // in the insertMemoryCard function, the ? = memoryCard
+      .then((dbRes) => {
+         // success
+         console.log("Updated memory card in the db: ", dbRes);
+         return res.status(200).json({ success: "Card updated" }); // return with a status
+      })
+      .catch((err) => {
+         console.log(err);
+         const dbError = `${err.code} ${err.sqlMessage}`;
          res.status(400).json({ dbError });
       });
 });

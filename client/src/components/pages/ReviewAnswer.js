@@ -4,6 +4,7 @@ import AppTemplate from "../ui/AppTemplate";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import actions from "../../store/actions";
+import axios from "axios";
 
 class ReviewAnswer extends React.Component {
    constructor(props) {
@@ -12,6 +13,41 @@ class ReviewAnswer extends React.Component {
          this.props.history.push("/review-empty");
       }
    }
+
+   updateCardWithNeedsWork(memoryCard) {
+      this.goToNextCard();
+   }
+
+   updateCardWithGotIt(memoryCard) {
+      // We need to make a copy of the memoryCard first before changing it:
+      const newMemoryCard = { ...memoryCard };
+      // get card we are on
+      // Biz logic:
+      /*
+      increase SuccessfulAttempts by 1
+      update lastAttemptedOn with today's date
+      */
+      newMemoryCard.totalSuccessfulAttempts += 1;
+      newMemoryCard.lastAttemptAt = Date.now();
+      // db PUT this card in our axios request
+      // use PUT to update something that already exists (must exist already!)
+      axios // save to database (make an api call)
+         .put(`/api/v1/memory-cards/${newMemoryCard.id}`, newMemoryCard)
+         // for PUT, you have to use an id - ${memoryCard.id}
+         .then((res) => {
+            console.log("Memory Card updated");
+            // display success overlay
+            this.goToNextCard();
+         })
+         .catch((err) => {
+            const data = err.response.data;
+            console.log(data);
+            // display error overlay & hide error overlay after 5 sec
+         });
+   }
+
+   // PUT to update
+   // UPSERT to update or if it doesn't exist, insert
 
    goToNextCard() {
       if (this.props.queue.index === this.props.queue.cards.length - 1) {
@@ -24,9 +60,8 @@ class ReviewAnswer extends React.Component {
       }
    }
 
-   storeEditableCard() {
+   storeEditableCard(memoryCard) {
       console.log("STORING_EDITABLE_CARD");
-      const memoryCard = this.props.queue.cards[this.props.queue.index];
       this.props.dispatch({
          type: actions.STORE_EDITABLE_CARD,
          payload: {
@@ -38,7 +73,7 @@ class ReviewAnswer extends React.Component {
 
    render() {
       const memoryCard = this.props.queue.cards[this.props.queue.index];
-
+      console.log("memory card: ", memoryCard);
       return (
          <AppTemplate>
             <div className="card">
@@ -56,7 +91,7 @@ class ReviewAnswer extends React.Component {
                to="/edit"
                className="btn btn-link mt-2"
                onClick={() => {
-                  this.storeEditableCard();
+                  this.storeEditableCard(memoryCard);
                }}
             >
                Edit
@@ -65,7 +100,7 @@ class ReviewAnswer extends React.Component {
                <button
                   className="btn btn-outline-primary"
                   onClick={() => {
-                     this.goToNextCard();
+                     this.updateCardWithNeedsWork(memoryCard);
                   }}
                >
                   Needs work
@@ -73,7 +108,7 @@ class ReviewAnswer extends React.Component {
                <button
                   className="btn btn-primary ml-4"
                   onClick={() => {
-                     this.goToNextCard();
+                     this.updateCardWithGotIt(memoryCard);
                   }}
                >
                   <img
