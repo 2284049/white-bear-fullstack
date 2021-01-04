@@ -15,7 +15,21 @@ class ReviewAnswer extends React.Component {
    }
 
    updateCardWithNeedsWork(memoryCard) {
-      this.goToNextCard();
+      const newMemoryCard = { ...memoryCard }; // make a shallow copy before changing
+      newMemoryCard.totalSuccessfulAttempts = 0; // what we want to change
+      newMemoryCard.lastAttemptAt = Date.now(); // what we want to change
+      axios // use .put to update something that ALREADY EXISTS
+         .put(`/api/v1/memory-cards/${newMemoryCard.id}`, newMemoryCard) // for PUT, you have to use an id - ${memoryCard.id}
+         .then((res) => {
+            console.log("Memory Card updated");
+            // display success overlay
+            this.goToNextCard();
+         })
+         .catch((err) => {
+            const data = err.response.data;
+            console.log(data);
+            // display error overlay & hide error overlay after 5 sec
+         });
    }
 
    updateCardWithGotIt(memoryCard) {

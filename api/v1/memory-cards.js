@@ -14,7 +14,7 @@ const validateJwt = require("../../utils/validateJwt");
 // @access      Private
 router.get("/", validateJwt, (req, res) => {
    // middelware = putting a function in the "middle" (here the function is validateJwt)
-   console.log(req.query);
+   // console.log(req.query);
    const { searchTerm, order } = req.query;
    // writing it the way above is called object destructuring
    // basically we are saying we have 2 new variables to reference:
@@ -59,7 +59,7 @@ router.get("/", validateJwt, (req, res) => {
                // we don't have to get all of these; just what we need
             };
          });
-         console.log(camelCasedMemoryCards);
+         // console.log(camelCasedMemoryCards);
          return res.status(200).json(camelCasedMemoryCards);
       })
       .catch((err) => {

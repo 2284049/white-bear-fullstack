@@ -12,17 +12,18 @@ import {
 import { connect } from "react-redux";
 import actions from "../../store/actions";
 import isEmpty from "lodash/isEmpty";
-import memoryCards from "../../mock-data/memory-cards";
+// mock data: import memoryCards from "../../mock-data/memory-cards";
 import without from "lodash/without";
+import axios from "axios";
 
-const memoryCard = memoryCards[3];
+// mock data const memoryCard = memoryCards[3];
 
 class Edit extends React.Component {
    constructor(props) {
       super(props);
       this.state = {
-         answerText: memoryCard.answer,
-         imageryText: memoryCard.imagery,
+         answerText: this.props.editableCard.card.answer,
+         imageryText: this.props.editableCard.card.imagery,
          isDisplayingDeleteButton: false,
       };
    }
@@ -65,6 +66,33 @@ class Edit extends React.Component {
       }
       if (this.props.editableCard.prevRoute === "/all-cards") {
          this.props.history.push("/all-cards");
+      }
+   }
+
+   saveCardEdit() {
+      if (!this.checkHasInvalidCharCount()) {
+         const memoryCard = { ...this.props.editableCard.card }; // make a shallow copy first
+         memoryCard.answer = this.state.answerText;
+         memoryCard.imagery = this.state.imageryText;
+         axios // use .put to update something that ALREADY EXISTS
+            .put(`/api/v1/memory-cards/${memoryCard.id}`, memoryCard) // for PUT, you have to use an id - ${memoryCard.id}
+            .then((res) => {
+               console.log("Memory Card updated");
+               // update queue in redux with edited card:
+               const cards = [...this.props.queue.cards]; // make a copy of the queue cards from Redux
+               cards[this.props.queue.index] = memoryCard; // get the card we are on and set it as memoryCard
+               this.props.dispatch({
+                  type: actions.UPDATE_QUEUED_CARDS,
+                  payload: cards,
+               });
+               // display success overlay
+               this.props.history.push(this.props.editableCard.prevRoute);
+            })
+            .catch((err) => {
+               const data = err.response.data;
+               console.log(data);
+               // display error overlay & hide error overlay after 5 sec
+            });
       }
    }
 
@@ -142,13 +170,15 @@ class Edit extends React.Component {
                   >
                      Discard changes
                   </Link>
-                  <Link
-                     to={this.props.editableCard.prevRoute}
+                  <button
                      className={classnames(
                         "btn btn-primary btn-lg ml-4 float-right",
                         { disabled: this.checkHasInvalidCharCount() }
                      )}
                      id="edit-save"
+                     onClick={() => {
+                        this.saveCardEdit();
+                     }}
                   >
                      <img
                         src={saveIcon}
@@ -161,7 +191,7 @@ class Edit extends React.Component {
                         }}
                      />
                      Save
-                  </Link>
+                  </button>
 
                   <p className="text-center lead text-muted my-5">
                      Card properties
