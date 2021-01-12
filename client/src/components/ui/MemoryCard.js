@@ -17,8 +17,7 @@ class MemoryCard extends React.Component {
    }
 
    render() {
-      const memoryCard = this.props.queue.cards[this.props.queue.index];
-
+      const memoryCard = this.props.card;
       return (
          <div className="d-flex align-items-start mb-5">
             <div className="app-card flex-fill">
@@ -56,8 +55,6 @@ class MemoryCard extends React.Component {
 
 function mapStateToProps(state) {
    //global state
-   return {
-      queue: state.queue,
-   };
+   return {};
 }
 export default connect(mapStateToProps)(MemoryCard);
